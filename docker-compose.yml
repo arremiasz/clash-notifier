@@ -1,0 +1,15 @@
+services:
+  clash-bot:
+    build: .
+    container_name: clash-bot
+    restart: unless-stopped
+    environment:
+      # Replace these with your actual keys
+      - RIOT_API_KEY=${RIOT_API_KEY}
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+
+      # Copy your Channel ID here (Right click channel -> Copy ID)
+      #- ANNOUNCEMENT_CHANNEL_ID=977244381675393024
+
+      # Optional: Change region if needed
+      - RIOT_REGION=na1
