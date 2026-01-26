@@ -2,6 +2,8 @@ services:
   clash-bot:
     build: .
     container_name: clash-bot
+    volumes:
+      - ./clash_state.json:/app/clash_state.json
     restart: unless-stopped
     environment:
       # Replace these with your actual keys
@@ -13,3 +15,4 @@ services:
 
       # Optional: Change region if needed
       - RIOT_REGION=na1
+

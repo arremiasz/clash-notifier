@@ -316,7 +316,7 @@ async def core_clash_check(target_guild_id=None):
 
     base_embed = discord.Embed(
         title=f"🏆 Clash Alert: {next_tournament['name']} Cup",
-        description=f"{next_tournament['secondary_name']} is coming up!\n📅 **Dates:** {dates_str}\n\nRegister your availability below.",
+        description=f"The next Clash is coming up!\n📅 **Dates:** {dates_str}\n\nRegister your availability below.",
         color=discord.Color.gold()
     )
     base_embed.add_field(name="⏰ Lock-In Schedule", value=time_schedule, inline=False)
@@ -437,6 +437,18 @@ async def core_clash_check(target_guild_id=None):
 @check_clash_schedule.before_loop
 async def before_check():
     await bot.wait_until_ready()
+    # Calculate delay to run at a specific time (e.g., 14:00 UTC)
+    now = datetime.datetime.now(datetime.timezone.utc)
+    # Target time: 18:00 UTC (Adjust as needed)
+    target_time = now.replace(hour=18, minute=0, second=0, microsecond=0)
+    
+    if now > target_time:
+        # If we passed today's target time, schedule for tomorrow
+        target_time += datetime.timedelta(days=1)
+    
+    delay_seconds = (target_time - now).total_seconds()
+    print(f"Scheduling first automatic check in {delay_seconds/3600:.2f} hours (at {target_time.strftime('%H:%M UTC')})...")
+    await asyncio.sleep(delay_seconds)
 
     # Calculate delay to run at a specific time (e.g., 14:00 UTC)
     now = datetime.datetime.now(datetime.timezone.utc)
