@@ -256,6 +256,9 @@ async def checkclash(interaction: discord.Interaction):
     # Call the logic ONLY for this guild
     await core_clash_check(target_guild_id=interaction.guild_id)
 
+@bot.tree.command(name="list", description="")
+async def list_tournaments(interaction: discord.Interaction):
+    await interaction.response.send_message(get_upcoming_clash_tournaments(), ephemeral=True)
 
 @tasks.loop(hours=24)
 async def check_clash_schedule():
