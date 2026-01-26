@@ -424,7 +424,7 @@ async def core_clash_check(target_guild_id=None):
         updated_embed = view.update_embed(base_embed)
 
         try:
-            message = await channel.send(content=f"{PING_ROLE} New Clash Tournament detected!", embed=updated_embed,
+            message = await channel.send(content=f"{PING_ROLE} New Clash Tournament Soon!", embed=updated_embed,
                                          view=view)
             guild_data['message_id'] = message.id
         except discord.Forbidden:
