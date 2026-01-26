@@ -258,7 +258,7 @@ async def checkclash(interaction: discord.Interaction):
 
 @bot.tree.command(name="listtournaments", description="List tournaments from the Riot API")
 async def list_tournaments(interaction: discord.Interaction):
-    if interaction.user.id == 271789786883293195:
+    if interaction.user.id == "271789786883293195":
         await interaction.response.send_message(get_upcoming_clash_tournaments(), ephemeral=True)
 
 @tasks.loop(hours=24)
