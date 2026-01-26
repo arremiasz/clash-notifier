@@ -17,8 +17,8 @@ DATA_FILE = "clash_state.json"
 
 # --- GLOBAL STATE ---
 # Stores configuration and RSVPs for all guilds
-# Structure: { 'guilds': { 'GUILD_ID': { 'channel_id': 123, 'message_id': 456, 'tournament_id': '...', 'saturday': {...}, 'sunday': {...} } } }
-CLASH_STATE = {'guilds': {}}
+# Structure: { 'guilds': { 'GUILD_ID': { 'channel_id': 123, 'message_id': 456, 'tournament_id': '...', 'saturday': {...}, 'sunday': {...} } }, 'days': [ 'TOURNAMENT_ID', ... ] }
+CLASH_STATE = {'guilds': {}, 'days': []}
 
 # --- SETUP ---
 intents = discord.Intents.default()
@@ -34,11 +34,15 @@ def load_state():
                 data = json.load(f)
                 # Ensure root structure exists
                 if 'guilds' not in data:
-                    return {'guilds': {}}
+                    data['guilds'] = {}
+
+                if 'days' not in data:
+                    data['days'] = []
+
                 return data
         except json.JSONDecodeError:
-            return {'guilds': {}}
-    return {'guilds': {}}
+            return {'guilds': {}, 'days': []}
+    return {'guilds': {}, 'days': []}
 
 
 def save_state(data):
@@ -277,12 +281,20 @@ async def core_clash_check(target_guild_id=None):
     tournaments = get_upcoming_clash_tournaments()
 
     if not tournaments:
+        CLASH_STATE['days'] = []
+        save_state(CLASH_STATE)
         return
+
+    for t in tournaments:
+        if t['id'] in CLASH_STATE['days']: # if t already is in the tournament list, it already has been announced
+            return
+        else:
+            CLASH_STATE['days'].append(t['id'])
 
     # 1. Determine Window
     next_tournament = tournaments[0]
     first_start_time = next_tournament['startTime']
-    cutoff_time = first_start_time + (7 * 24 * 60 * 60 * 1000)
+    cutoff_time = first_start_time + (2 * 24 * 60 * 60 * 1000)
 
     # 2. Find Related Days
     related_days = [t for t in tournaments if t['startTime'] <= cutoff_time]
@@ -445,8 +457,8 @@ async def before_check():
 
     # Calculate delay to run at a specific time (e.g., 14:00 UTC)
     now = datetime.datetime.now(datetime.timezone.utc)
-    # Target time: 14:00 UTC (Adjust as needed)
-    target_time = now.replace(hour=18, minute=0, second=0, microsecond=0)
+    # Target time: 16:00 CST / 22:00 UTC (Adjust as needed)
+    target_time = now.replace(hour=22, minute=0, second=0, microsecond=0)
 
     if now > target_time:
         # If we passed today's target time, schedule for tomorrow
