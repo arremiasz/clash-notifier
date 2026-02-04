@@ -16,3 +16,5 @@ services:
       # Optional: Change region if needed
       - RIOT_REGION=na1
 
+      - PYTHONUNBUFFERED=1
+
