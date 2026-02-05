@@ -70,8 +70,6 @@ def get_upcoming_clash_tournaments():
                         upcoming.append(day)
 
             upcoming.sort(key=lambda x: x['startTime'])
-            if upcoming and upcoming.get('startTime') - current_time > 864000000:
-                return []
             return upcoming
         else:
             print(f"Error fetching data: {response.status_code} - {response.text}")
