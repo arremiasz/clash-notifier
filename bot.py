@@ -301,11 +301,24 @@ async def core_clash_check(target_guild_id=None):
         save_state(CLASH_STATE)
         return
 
+    # If the first tournament in the list is Day 2, Day 1 has already passed.
+    # We skip to prevent a new announcement from triggering on Sunday.
+    if tournaments[0].get('secondary_name', '').lower() == 'day 2':
+        print("API only shows Day 2 remaining. Skipping to prevent Sunday duplicate announcements.")
+        return
+
+    # --- 10-DAY LIMIT GUARD CLAUSE ---
+    current_time_ms = datetime.datetime.now().timestamp() * 1000
+    time_until_reg = tournaments[0]['registrationTime'] - current_time_ms
+    if time_until_reg > (10 * 24 * 60 * 60 * 1000):
+        print(f"Tournament is {time_until_reg / (24 * 60 * 60 * 1000):.1f} days away (limit 10). Skipping for now.")
+        return
+
     # Update 'days' list so we track what we've seen, but don't stop execution
     for t in tournaments:
         if t['id'] not in CLASH_STATE['days']:
             CLASH_STATE['days'].append(t['id'])
-    
+
     # 1. Determine Window
     next_tournament = tournaments[0]
     first_start_time = next_tournament['startTime']
